@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para mi persona favorita</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #fff5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 70vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .content {
+            text-align: center;
+            color: #d63384;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        h1 { font-size: 1.5rem; margin-bottom: 10px; }
+        #timer { font-size: 1.1rem; font-weight: bold; color: #a94442; }
+        .phrase { font-style: italic; margin-top: 10px; color: #ff4d6d; }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <canvas id="treeCanvas"></canvas>
+    </div>
+
+    <div class="content">
+        <h1>Para el amor de mi vida ❤️</h1>
+        <div id="timer">Calculando nuestro tiempo...</div>
+        <p class="phrase">"Cada segundo a tu lado es mi regalo favorito"</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('treeCanvas');
+        const ctx = canvas.getContext('2d');
+        const timerElement = document.getElementById('timer');
+
+        // Ajustar tamaño del canvas
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight * 0.7;
+
+        // --- CONFIGURACIÓN DEL CONTADOR ---
+        const FECHA_INICIO = new Date('2023-02-14T00:00:00'); // <--- CAMBIA TU FECHA AQUÍ
+
+        function updateTimer() {
+            const now = new Date();
+            const diff = now - FECHA_INICIO;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / 1000 / 60) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            timerElement.innerHTML = `${days} días, ${hours}h, ${minutes}m, ${seconds}s`;
+        }
+        setInterval(updateTimer, 1000);
+
+        // --- DIBUJO DEL ÁRBOL ---
+        function drawTree(startX, startY, len, angle, branchWidth) {
+            ctx.beginPath();
+            ctx.save();
+            ctx.strokeStyle = "#4b2c20"; // Color del tronco
+            ctx.lineWidth = branchWidth;
+            ctx.translate(startX, startY);
+            ctx.rotate(angle * Math.PI / 180);
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -len);
+            ctx.stroke();
+
+            if (len < 10) {
+                // Dibujar corazón (hoja)
+                drawHeart(0, -len);
+                ctx.restore();
+                return;
+            }
+
+            // Ramas
+            drawTree(0, -len, len * 0.75, angle - 20, branchWidth * 0.7);
+            drawTree(0, -len, len * 0.75, angle + 20, branchWidth * 0.7);
+
+            ctx.restore();
+        }
+
+        function drawHeart(x, y) {
+            ctx.fillStyle = "#ff4d6d";
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.bezierCurveTo(x, y - 3, x - 5, y - 3, x - 5, y);
+            ctx.bezierCurveTo(x - 5, y + 3, x, y + 5, x, y + 7);
+            ctx.bezierCurveTo(x, y + 5, x + 5, y + 3, x + 5, y);
+            ctx.bezierCurveTo(x + 5, y - 3, x, y - 3, x, y);
+            ctx.fill();
+        }
+
+        // Iniciar dibujo
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Esperar un poco para que se vea la animación (simulada aquí con un delay)
+        setTimeout(() => {
+            drawTree(canvas.width / 2, canvas.height, canvas.height * 0.25, 0, 10);
+        }, 500);
+
+    </script>
+</body>
+</html>
